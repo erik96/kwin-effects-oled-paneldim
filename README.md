@@ -1,5 +1,7 @@
 # kwin-effects-oled-paneldim
 
+<img src="assets/logo.png" alt="OLED Panel Dim logo" width="96" align="right">
+
 KWin scripted effect for KDE Plasma 6 (Wayland and X11) that dims Plasma panels
 on selected monitors to reduce OLED burn-in, and restores full brightness while
 the pointer is over a panel - the same behaviour as Samsung Display Manager's
@@ -7,6 +9,8 @@ the pointer is over a panel - the same behaviour as Samsung Display Manager's
 
 Only windows of type *dock* (Plasma panels) are affected. Games, fullscreen
 video and everything else are untouched.
+
+![Panel dimmed vs. pointer over panel](assets/panels/panel-compare-crop.png)
 
 ## Install
 
