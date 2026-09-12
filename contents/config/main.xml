@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name="kwinrc"/>
+    <group name="Effect-paneldim">
+        <entry name="Brightness" type="Double">
+            <label>Panel brightness while dimmed (0.05 - 1.0)</label>
+            <default>0.35</default>
+            <min>0.05</min>
+            <max>1.0</max>
+        </entry>
+        <entry name="Duration" type="Int">
+            <label>Fade duration in milliseconds</label>
+            <default>150</default>
+            <min>0</min>
+            <max>2000</max>
+        </entry>
+        <entry name="HoverUndim" type="Bool">
+            <label>Restore full brightness while the pointer is over the panel</label>
+            <default>true</default>
+        </entry>
+        <entry name="Outputs" type="String">
+            <label>Comma-separated list of monitors to dim. Each entry matches a connector name (DP-2), EDID model (Odyssey G8), serial number, or "Manufacturer Model". "*" means all monitors.</label>
+            <default>*</default>
+        </entry>
+    </group>
+</kcfg>

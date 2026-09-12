@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PanelDimConfig</class>
+ <widget class="QWidget" name="PanelDimConfig">
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_brightness">
+     <property name="text"><string>Dimmed brightness:</string></property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QDoubleSpinBox" name="kcfg_Brightness">
+     <property name="decimals"><number>2</number></property>
+     <property name="minimum"><double>0.050000000000000</double></property>
+     <property name="maximum"><double>1.000000000000000</double></property>
+     <property name="singleStep"><double>0.050000000000000</double></property>
+     <property name="value"><double>0.350000000000000</double></property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_duration">
+     <property name="text"><string>Fade duration:</string></property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QSpinBox" name="kcfg_Duration">
+     <property name="suffix"><string> ms</string></property>
+     <property name="minimum"><number>0</number></property>
+     <property name="maximum"><number>2000</number></property>
+     <property name="singleStep"><number>50</number></property>
+     <property name="value"><number>150</number></property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="kcfg_HoverUndim">
+     <property name="text"><string>Restore brightness while the pointer is over the panel</string></property>
+     <property name="checked"><bool>true</bool></property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_outputs">
+     <property name="text"><string>Monitors to dim:</string></property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="kcfg_Outputs">
+     <property name="placeholderText"><string>* or e.g. DP-2, Odyssey G8, H4ZX123456</string></property>
+     <property name="text"><string>*</string></property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="label_hint">
+     <property name="text"><string>Comma-separated. Matches connector name, EDID model, serial number, or "Manufacturer Model". Use * for all monitors. The effect logs every detected monitor to the journal on load (journalctl --user -b -g paneldim).</string></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="enabled"><bool>false</bool></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
