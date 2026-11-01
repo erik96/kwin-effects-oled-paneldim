@@ -6,6 +6,9 @@
 // so black stays black; only luminous content loses intensity.
 //
 // State is one entry per dimmed window: { window, animId, hovered }.
+//
+// An animation keeps its window painted even when hidden, so the dim is
+// dropped while an auto-hide panel is hidden and re-applied when shown.
 
 "use strict";
 
@@ -15,7 +18,11 @@ const state = {
     hover: true,      // un-dim while pointer is over the panel
     outputs: ["*"],   // include list, lowercased
     entries: [],
+    watched: [],      // windows with windowHiddenChanged connected
+    hiding: [],       // dim held during slide-out: { window, animId }
 };
+
+const SLIDE_OUT_MS = 200; // Sliding Popups default
 
 // ---------------------------------------------------------------- logging
 //
@@ -114,19 +121,80 @@ function findIndex(w) {
     return state.entries.findIndex(e => e.window === w);
 }
 
-function dim(w) {
-    if (!isTarget(w) || findIndex(w) >= 0) {
+function dim(w, instant) {
+    if (!isTarget(w)) {
         return;
     }
+    watch(w);
+    if (!w.visible || findIndex(w) >= 0) {
+        return;
+    }
+    stopHiding(w);
+    const hovered = state.hover && windowContains(w, effects.cursorPos);
+    const target = hovered ? 1.0 : state.level;
     const animId = set({
         window: w,
         type: Effect.Brightness,
-        from: 1.0,
-        to: state.level,
-        duration: state.duration,
+        from: instant ? target : 1.0,
+        to: target,
+        duration: instant ? 0 : state.duration,
         curve: QEasingCurve.InOutQuad,
     });
-    state.entries.push({ window: w, animId: animId, hovered: false });
+    state.entries.push({ window: w, animId: animId, hovered: hovered });
+}
+
+function watch(w) {
+    if (state.watched.includes(w) || !w.windowHiddenChanged) {
+        return;
+    }
+    state.watched.push(w);
+    w.windowHiddenChanged.connect(onHiddenChanged);
+}
+
+function onHiddenChanged(w) {
+    if (w.visible) {
+        dim(w, true);
+    } else {
+        const i = findIndex(w);
+        const wasDim = i >= 0 && !state.entries[i].hovered;
+        undim(w);
+        if (wasDim) {
+            holdDimDuringSlideOut(w);
+        }
+    }
+}
+
+// Keeps the panel dimmed while it slides out, then releases the window.
+function holdDimDuringSlideOut(w) {
+    if (!effects.isEffectLoaded("slidingpopups") || effects.hasActiveFullScreenEffect) {
+        return;
+    }
+    const animId = animate({
+        window: w,
+        type: Effect.Brightness,
+        from: state.level,
+        to: state.level,
+        // End slightly early so the panel never flashes after the slide.
+        duration: Math.round(animationTime(SLIDE_OUT_MS) * 0.85),
+    });
+    state.hiding.push({ window: w, animId: animId });
+}
+
+function stopHiding(w) {
+    const i = state.hiding.findIndex(h => h.window === w);
+    if (i >= 0) {
+        cancel(state.hiding[i].animId);
+        state.hiding.splice(i, 1);
+    }
+}
+
+function forget(w) {
+    undim(w);
+    stopHiding(w);
+    const i = state.watched.indexOf(w);
+    if (i >= 0) {
+        state.watched.splice(i, 1);
+    }
 }
 
 function undim(w) {
@@ -145,7 +213,7 @@ function rescan() {
             undim(e.window);
         }
     });
-    effects.stackingOrder.forEach(dim);
+    effects.stackingOrder.forEach(w => dim(w, false));
 }
 
 // ---------------------------------------------------------------- hover
@@ -189,8 +257,8 @@ function reconfigure() {
 loadConfig();
 logOutputs();
 
-effects.windowAdded.connect(dim);
-effects.windowClosed.connect(undim);
+effects.windowAdded.connect(w => dim(w, false));
+effects.windowClosed.connect(forget);
 effect.configChanged.connect(reconfigure);
 
 // startMousePolling() no longer exists in Plasma 6; mouseChanged is always live
